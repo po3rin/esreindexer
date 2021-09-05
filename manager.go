@@ -2,17 +2,25 @@ package esreindexer
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"time"
+
+	"github.com/po3rin/esreindexer/entity"
+	"golang.org/x/sync/errgroup"
 )
 
 type Client interface {
 	Reindex(ctx context.Context, src string, dest string) (string, error)
 	GetIndexSetting(ctx context.Context, index string) (numberOfReplicas int, refreshInterval int, err error)
 	UpdateIndexSetting(ctx context.Context, index string, numberOfReplicas int, refreshInterval int) error
+	CompletedTask(ctx context.Context, taskID string) (bool, error)
 }
 
 type Store interface {
-	PutTaskInfo(id string, NumberOfReplicas int, RefreshInterval int) error
-	TaskInfo(id string) (numberOfReplicas int, refreshInterval int, err error)
+	PutTaskInfo(index string, taskID string, NumberOfReplicas int, RefreshInterval int) error
+	TaskInfo(taskID string) (numberOfReplicas int, refreshInterval int, err error)
+	AllTaskd() map[string]entity.Task
 }
 
 type ReindexManager struct {
@@ -43,7 +51,7 @@ func (m *ReindexManager) PublishReindexTask(ctx context.Context, src, dest strin
 		return "", err
 	}
 
-	err = m.store.PutTaskInfo(taskID, numberOfReplicas, refreshInterval)
+	err = m.store.PutTaskInfo(dest, taskID, numberOfReplicas, refreshInterval)
 	if err != nil {
 		return "", err
 	}
@@ -51,6 +59,45 @@ func (m *ReindexManager) PublishReindexTask(ctx context.Context, src, dest strin
 	return taskID, nil
 }
 
-func (m *ReindexManager) Run(ctx context.Context) error {
+func (m *ReindexManager) API(ctx context.Context) error {
+	return errors.New("no impliments")
+}
+
+func (m *ReindexManager) Monitor(ctx context.Context) error {
+	eg, ctx := errgroup.WithContext(ctx)
+
+	eg.Go(func() error {
+		ticker := time.NewTicker(1 * time.Second)
+		for {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-ticker.C:
+				ids := m.store.AllTaskd()
+				for id, task := range ids {
+					completed, err := m.client.CompletedTask(ctx, id)
+					if err != nil {
+						fmt.Println(err)
+						continue
+					}
+					if completed {
+						fmt.Printf("%v is completed!\n", id)
+						m.client.UpdateIndexSetting(
+							ctx,
+							task.Index,
+							task.NumberOfReplicas,
+							task.RefreshInterval,
+						)
+						continue
+					}
+					fmt.Printf("%v is running!\n", id)
+				}
+			}
+		}
+	})
+
+	if err := eg.Wait(); err != nil {
+		return err
+	}
 	return nil
 }

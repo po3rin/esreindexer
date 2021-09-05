@@ -12,6 +12,7 @@ require (
 	github.com/ory/dockertest v3.3.5+incompatible
 	github.com/po3rin/eskeeper v0.1.2
 	golang.org/x/net v0.0.0-20210903162142-ad29c8ab022f // indirect
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20210903071746-97244b99971b // indirect
 	gotest.tools v2.2.0+incompatible // indirect
 )

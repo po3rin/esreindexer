@@ -1,4 +1,10 @@
 index:
+  - name: example-v1
+    mapping: testdata/test.json
+
+  - name: example-v2
+    mapping: testdata/test.json
+
   - name: test-client
     mapping: testdata/test.json
 
