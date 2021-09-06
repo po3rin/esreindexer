@@ -6,7 +6,9 @@
 
 Elasticsearch reindex manager optimizing index parameters for reindex.
 
-## Quick Start
+## Using esreindexer components
+
+Implementation example using esreindexer components is in the example directory.
 
 ```sh
 // setup Elasticsearch

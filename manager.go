@@ -10,13 +10,6 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type Client interface {
-	Reindex(ctx context.Context, src string, dest string) (string, error)
-	GetIndexSetting(ctx context.Context, index string) (numberOfReplicas int, refreshInterval int, err error)
-	UpdateIndexSetting(ctx context.Context, index string, numberOfReplicas int, refreshInterval int) error
-	CompletedTask(ctx context.Context, taskID string) (bool, error)
-}
-
 type Store interface {
 	PutTaskInfo(index string, taskID string, NumberOfReplicas int, RefreshInterval int) error
 	TaskInfo(taskID string) (numberOfReplicas int, refreshInterval int, err error)
@@ -24,11 +17,11 @@ type Store interface {
 }
 
 type ReindexManager struct {
-	client Client
+	client *ESClient
 	store  Store
 }
 
-func NewReindexManager(client Client, store Store) *ReindexManager {
+func NewReindexManager(client *ESClient, store Store) *ReindexManager {
 	return &ReindexManager{
 		client: client,
 		store:  store,
@@ -81,6 +74,9 @@ func (m *ReindexManager) Monitor(ctx context.Context) error {
 				for id, task := range ids {
 					completed, err := m.client.CompletedTask(ctx, id)
 					if err != nil {
+						if errors.Is(err, context.DeadlineExceeded) {
+							return err
+						}
 						fmt.Println(err)
 						continue
 					}
@@ -93,6 +89,9 @@ func (m *ReindexManager) Monitor(ctx context.Context) error {
 							task.RefreshInterval,
 						)
 						if err != nil {
+							if errors.Is(err, context.DeadlineExceeded) {
+								return err
+							}
 							fmt.Println(err)
 							continue
 						}

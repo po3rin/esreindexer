@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"os/signal"
@@ -16,7 +17,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	conf := elasticsearch.Config{}
@@ -54,6 +55,9 @@ func main() {
 	}
 
 	if err := eg.Wait(); err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			os.Exit(0)
+		}
 		fmt.Println(err)
 		os.Exit(1)
 	}
