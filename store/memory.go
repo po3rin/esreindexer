@@ -17,11 +17,13 @@ func NewMemoryStore() *MemoryStore {
 }
 
 func (m *MemoryStore) PutTaskInfo(index string, taskID string, numberOfReplicas int, refreshInterval int) error {
-	m.Store[taskID] = entity.Task{
+	t := entity.Task{
 		Index:            index,
 		NumberOfReplicas: numberOfReplicas,
 		RefreshInterval:  refreshInterval,
 	}
+
+	m.Store[taskID] = t
 	return nil
 }
 

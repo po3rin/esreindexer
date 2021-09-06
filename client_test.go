@@ -16,8 +16,10 @@ func TestIndexSetting(t *testing.T) {
 		refreshInterval  int
 	}{
 		{
-			name:  "update-revert",
-			index: "test-client",
+			name:             "update-revert",
+			index:            "test-client",
+			numberOfReplicas: 3,
+			refreshInterval:  -1,
 		},
 	}
 	conf := elasticsearch.Config{
@@ -37,7 +39,7 @@ func TestIndexSetting(t *testing.T) {
 				ctx, tt.index, tt.numberOfReplicas, tt.refreshInterval,
 			)
 			if err != nil {
-				t.Fatal(err)
+				t.Fatalf("failed to update: %+v", err)
 			}
 
 			gotNR, gotRI, err := client.GetIndexSetting(ctx, tt.index)

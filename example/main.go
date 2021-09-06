@@ -25,19 +25,23 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	c := esreindexer.NewESClient(es)
 
-	s := store.NewMemoryStore()
-
-	m := esreindexer.NewReindexManager(c, s)
+	m := esreindexer.NewReindexManager(
+		esreindexer.NewESClient(es), store.NewMemoryStore(),
+	)
 
 	eg, ctx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
 		return m.Monitor(ctx)
 	})
 
-	time.Sleep(3 * time.Second)
-	m.PublishReindexTask(ctx, "example-v1", "example-v2")
+	time.Sleep(2 * time.Second)
+	id, err := m.PublishReindexTask(ctx, "example-v1", "example-v2")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Printf("published id: %+v\n", id)
 
 	quit := make(chan os.Signal, 1)
 	defer close(quit)

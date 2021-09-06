@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strconv"
 	"strings"
 
 	"github.com/elastic/go-elasticsearch/v7"
@@ -24,6 +25,13 @@ type ReindexRes struct {
 
 type GetTaskRes struct {
 	Completed bool `json:"completed"`
+}
+
+type IndesSettingRes map[string]map[string]Setting
+
+type Setting struct {
+	RefreshInterval  string `json:"index.refresh_interval"`
+	NumberOfReplicas string `json:"index.number_of_replicas"`
 }
 
 func (c *ESClient) Reindex(ctx context.Context, src string, dest string) (string, error) {
@@ -69,10 +77,15 @@ func (c *ESClient) Reindex(ctx context.Context, src string, dest string) (string
 }
 
 func (c *ESClient) UpdateIndexSetting(ctx context.Context, index string, numberOfReplicas int, refreshInterval int) error {
+	ri := strconv.Itoa(refreshInterval)
+	if ri != "-1" {
+		ri += "s"
+	}
+
 	body := strings.NewReader(
 		fmt.Sprintf(
-			`{"index": {"number_of_replicas": %d, "refresh_interval" :%d}}`,
-			numberOfReplicas, refreshInterval,
+			`{"index": {"number_of_replicas": %d, "refresh_interval": "%s"}}`,
+			numberOfReplicas, ri,
 		),
 	)
 
@@ -91,7 +104,7 @@ func (c *ESClient) UpdateIndexSetting(ctx context.Context, index string, numberO
 		if err != nil {
 			return err
 		}
-		return fmt.Errorf("failed to reindex [index=%v, statusCode=%v, res=%v]", index, res.StatusCode, string(body))
+		return fmt.Errorf("failed to update index setting [index=%v, statusCode=%v, res=%v]", index, res.StatusCode, string(body))
 	}
 
 	return nil
@@ -103,6 +116,9 @@ func (c *ESClient) GetIndexSetting(ctx context.Context, index string) (numberOfR
 	res, err := gs(
 		gs.WithIndex(index),
 		gs.WithContext(ctx),
+		gs.WithFlatSettings(true),
+		gs.WithIncludeDefaults(true),
+		gs.WithName("index.number_of_replicas", "index.refresh_interval"),
 	)
 	if err != nil {
 		return 0, 0, err
@@ -115,7 +131,43 @@ func (c *ESClient) GetIndexSetting(ctx context.Context, index string) (numberOfR
 		return 0, 0, fmt.Errorf("failed to reindex [index=%v, statusCode=%v, res=%v]", index, res.StatusCode, string(body))
 	}
 
-	return 0, 0, nil
+	bodyBytes, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	var settingRes IndesSettingRes
+	if err := json.Unmarshal(bodyBytes, &settingRes); err != nil {
+		return 0, 0, err
+	}
+
+	var (
+		resultNumberOfReplicas string
+		resultRefreshInterval  string
+	)
+	if settingRes[index]["settings"].NumberOfReplicas == "" {
+		resultNumberOfReplicas = settingRes[index]["defaults"].NumberOfReplicas
+	} else {
+		resultNumberOfReplicas = settingRes[index]["settings"].NumberOfReplicas
+	}
+
+	if settingRes[index]["settings"].RefreshInterval == "" {
+		resultRefreshInterval = settingRes[index]["defaults"].RefreshInterval
+	} else {
+		resultRefreshInterval = settingRes[index]["settings"].RefreshInterval
+	}
+
+	nr, err := strconv.Atoi(resultNumberOfReplicas)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	resultRefreshInterval = strings.TrimSuffix(resultRefreshInterval, "s")
+	ri, err := strconv.Atoi(resultRefreshInterval)
+	if err != nil {
+		return 0, 0, err
+	}
+	return nr, ri, nil
 }
 
 func (c *ESClient) CompletedTask(ctx context.Context, taskID string) (bool, error) {
