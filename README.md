@@ -24,7 +24,7 @@ Elasticsearch reindex manager optimizing index parameters for reindex.
 
 ## Using esreindexer components
 
-Implementation example using esreindexer components is in the example directory.
+Implementation example using esreindexer components is in the [example directory](https://github.com/po3rin/esreindexer/tree/main/example).
 
 ```sh
 // setup Elasticsearch
