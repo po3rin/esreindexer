@@ -6,6 +6,22 @@
 
 Elasticsearch reindex manager optimizing index parameters for reindex.
 
+## Supports
+
+### Mode
+- [x] Agent mode
+- [ ] API mode
+
+### Store
+- [x] Momory Store
+- [ ] MySQL Store
+- [ ] etcd Store
+
+### Others
+- [ ] WebHook
+- [ ] Before Plugin
+- [ ] After Plugin
+
 ## Using esreindexer components
 
 Implementation example using esreindexer components is in the example directory.
