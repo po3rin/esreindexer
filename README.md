@@ -6,6 +6,14 @@
 
 Elasticsearch reindex manager optimizing index parameters for reindex.
 
+## Usecase
+
+esreindexer publish reindex tasks after optimizing the index setting to reindex.
+Start monitor to check the progress of the task, and if the task is finished, restore the index setting.
+The information of the task to be monitored is saved in the esreindexer store. The esreindexer store provides Store interface and the required store implementation is available.
+
+![esreindexer-usecase](./esreindexer.png)
+
 ## Supports
 
 ### Mode
