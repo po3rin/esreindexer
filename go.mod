@@ -6,7 +6,7 @@ require (
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/Microsoft/go-winio v0.5.0 // indirect
 	github.com/containerd/continuity v0.1.0 // indirect
-	github.com/elastic/go-elasticsearch/v7 v7.14.0
+	github.com/elastic/go-elasticsearch/v7 v7.15.0
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.7.4
 	github.com/gotestyourself/gotestyourself v2.2.0+incompatible // indirect
