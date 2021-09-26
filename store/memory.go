@@ -41,7 +41,7 @@ func (m *MemoryStore) TaskInfo(taskID string) (numberOfReplicas int, refreshInte
 	return info.NumberOfReplicas, info.RefreshInterval, nil
 }
 
-func (m *MemoryStore) AllTaskd() map[string]entity.Task {
+func (m *MemoryStore) AllTask() map[string]entity.Task {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	return m.Store

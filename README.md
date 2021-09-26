@@ -30,6 +30,32 @@ The information of the task to be monitored is saved in the esreindexer store. T
 - [ ] Before Plugin
 - [ ] After Plugin
 
+## Using esreindexer as API server
+
+API mode provides reindex API using esreindexer
+
+```sh
+// setup Elasticsearch
+// example: setting with eskeeper
+$ docker-compose up -d
+$ eskeeper < testdata/test.eskeeper.ym 
+$ ./example/load_testdata.sh
+
+// checks data
+// example-v1 has 2 docs
+// example-v2 has no docs
+$ curl localhost:9200/_cat/indices/example-*
+yellow open example-v1 LnXp-WjXQh2iDjyCBd9fxg 2 2 2 0 4.2kb 4.2kb
+yellow open example-v2 4pxR7cpvSU-p0mg1vol6-A 2 2 0 0  416b  416b
+
+$ go run ./agent/main.go
+$ curl -X POST -H "Content-Type: application/json" -d '{"source": {"index": "example-v1"}, "dest": {"index": "example-v2"}}' localhost:8888/api/v1/reindex 
+
+$ curl localhost:9200/_cat/indices/example-*
+yellow open example-v1 LnXp-WjXQh2iDjyCBd9fxg 2 2 2 0 4.2kb 4.2kb
+yellow open example-v2 4pxR7cpvSU-p0mg1vol6-A 2 2 2 0 4.1kb 4.1kb
+```
+
 ## Using esreindexer components
 
 Implementation example using esreindexer components is in the [example directory](https://github.com/po3rin/esreindexer/tree/main/example).

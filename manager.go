@@ -13,7 +13,7 @@ import (
 type Store interface {
 	PutTaskInfo(index string, taskID string, NumberOfReplicas int, RefreshInterval int) error
 	TaskInfo(taskID string) (numberOfReplicas int, refreshInterval int, err error)
-	AllTaskd() map[string]entity.Task
+	AllTask() map[string]entity.Task
 }
 
 type ReindexManager struct {
@@ -66,9 +66,9 @@ func (m *ReindexManager) Monitor(ctx context.Context) error {
 			case <-ctx.Done():
 				return ctx.Err()
 			case <-ticker.C:
-				ids := m.store.AllTaskd()
+				ids := m.store.AllTask()
 				if len(ids) == 0 {
-					fmt.Println("no tasks")
+					continue
 				}
 
 				for id, task := range ids {

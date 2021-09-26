@@ -7,6 +7,8 @@ require (
 	github.com/Microsoft/go-winio v0.5.0 // indirect
 	github.com/containerd/continuity v0.1.0 // indirect
 	github.com/elastic/go-elasticsearch/v7 v7.14.0
+	github.com/gin-contrib/cors v1.3.1 // indirect
+	github.com/gin-gonic/gin v1.7.4 // indirect
 	github.com/gotestyourself/gotestyourself v2.2.0+incompatible // indirect
 	github.com/opencontainers/runc v1.0.2 // indirect
 	github.com/ory/dockertest v3.3.5+incompatible
@@ -14,5 +16,6 @@ require (
 	golang.org/x/net v0.0.0-20210903162142-ad29c8ab022f // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20210903071746-97244b99971b // indirect
+	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
 	gotest.tools v2.2.0+incompatible // indirect
 )
