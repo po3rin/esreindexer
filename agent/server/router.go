@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/po3rin/esreindexer/logger"
 )
 
 type ReindexCtl interface {
@@ -31,9 +32,9 @@ func (r *Handler) Reindex(c *gin.Context) {
 	id, err := r.reindexCtl.PublishReindexTask(c, json.Source.Index, json.Dest.Index)
 	if err != nil {
 		fmt.Println(err)
-		c.JSON(http.StatusInternalServerError, Err{Msg: err.Error()})
+		c.JSON(http.StatusInternalServerError, ReindexErr{Msg: err.Error()})
 	}
 
-	fmt.Printf("published id: %+v\n", id)
-	c.JSON(http.StatusOK, OK{ID: id})
+	logger.L.Infof("published id: %+v", id)
+	c.JSON(http.StatusOK, ReindexOK{ID: id})
 }

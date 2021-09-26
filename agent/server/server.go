@@ -29,9 +29,11 @@ func router(ctl ReindexCtl) *gin.Engine {
 	rg := r.Group("api/v1")
 	{
 		rg.GET("/healthz", func(c *gin.Context) {
-			c.JSON(http.StatusOK, "ok!")
+			c.JSON(http.StatusOK, HealthzOK{
+				Msg: "ok",
+			})
 		})
-		rg.POST("/reindex", h.Reindex)
+		rg.POST("/_reindex", h.Reindex)
 	}
 	return r
 }

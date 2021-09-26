@@ -11,6 +11,8 @@ import (
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/po3rin/esreindexer"
 	"github.com/po3rin/esreindexer/agent/server"
+	"github.com/po3rin/esreindexer/config"
+	"github.com/po3rin/esreindexer/logger"
 	"github.com/po3rin/esreindexer/store"
 	"golang.org/x/sync/errgroup"
 )
@@ -20,18 +22,23 @@ func main() {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	conf := elasticsearch.Config{}
+	conf := elasticsearch.Config{
+		Addresses:            []string{config.Conf.EsAddress},
+		Username:             config.Conf.EsUser,
+		Password:             config.Conf.EsPass,
+		EnableRetryOnTimeout: true,
+		MaxRetries:           3,
+	}
 	es, err := elasticsearch.NewClient(conf)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		logger.L.Fatalf("new Elasticsearch client: %v", err.Error())
 	}
 
 	m := esreindexer.NewReindexManager(
 		esreindexer.NewESClient(es), store.NewMemoryStore(),
 	)
 
-	srv := server.New(":8888", m)
+	srv := server.New(fmt.Sprintf(":%d", config.Conf.ApiPort), m)
 
 	eg, ctx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
@@ -53,9 +60,9 @@ func main() {
 
 	if err := eg.Wait(); err != nil {
 		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+			logger.L.Info("done")
 			os.Exit(0)
 		}
-		fmt.Println(err)
-		os.Exit(1)
+		logger.L.Fatal(err)
 	}
 }

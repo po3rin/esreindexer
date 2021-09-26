@@ -18,7 +18,7 @@ The information of the task to be monitored is saved in the esreindexer store. T
 
 ### Mode
 - [x] Agent mode
-- [ ] API mode
+- [x] API mode
 
 ### Store
 - [x] Momory Store

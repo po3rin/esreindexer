@@ -8,11 +8,14 @@ type ReindexReq struct {
 type Index struct {
 	Index string `json:"index"`
 }
+type HealthzOK struct {
+	Msg string `json:"msg"`
+}
 
-type OK struct {
+type ReindexOK struct {
 	ID string `json:"id"`
 }
 
-type Err struct {
+type ReindexErr struct {
 	Msg string `json:"msg"`
 }

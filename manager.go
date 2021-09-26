@@ -3,10 +3,10 @@ package esreindexer
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/po3rin/esreindexer/entity"
+	"github.com/po3rin/esreindexer/logger"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -52,10 +52,6 @@ func (m *ReindexManager) PublishReindexTask(ctx context.Context, src, dest strin
 	return taskID, nil
 }
 
-func (m *ReindexManager) API(ctx context.Context) error {
-	return errors.New("no impliments")
-}
-
 func (m *ReindexManager) Monitor(ctx context.Context) error {
 	eg, ctx := errgroup.WithContext(ctx)
 
@@ -77,11 +73,11 @@ func (m *ReindexManager) Monitor(ctx context.Context) error {
 						if errors.Is(err, context.DeadlineExceeded) {
 							return err
 						}
-						fmt.Println(err)
+						logger.L.Warn(err)
 						continue
 					}
 					if completed {
-						fmt.Printf("%v is completed!\n", id)
+						logger.L.Infof("task %v is completed!", id)
 						err := m.client.UpdateIndexSetting(
 							ctx,
 							task.Index,
@@ -92,12 +88,12 @@ func (m *ReindexManager) Monitor(ctx context.Context) error {
 							if errors.Is(err, context.DeadlineExceeded) {
 								return err
 							}
-							fmt.Println(err)
+							logger.L.Warnf("update index setting: %v", err)
 							continue
 						}
 						continue
 					}
-					fmt.Printf("%v is running!\n", id)
+					logger.L.Infof("task %v is running!", id)
 				}
 			}
 		}
