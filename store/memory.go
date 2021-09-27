@@ -21,6 +21,7 @@ func NewMemoryStore() *MemoryStore {
 func (m *MemoryStore) PutTaskInfo(index string, taskID string, numberOfReplicas int, refreshInterval int) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
 	t := entity.Task{
 		Index:            index,
 		NumberOfReplicas: numberOfReplicas,
@@ -34,11 +35,20 @@ func (m *MemoryStore) PutTaskInfo(index string, taskID string, numberOfReplicas 
 func (m *MemoryStore) TaskInfo(taskID string) (numberOfReplicas int, refreshInterval int, err error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
 	info, ok := m.Store[taskID]
 	if !ok {
 		return 0, 0, fmt.Errorf("taskID %v is not found", taskID)
 	}
 	return info.NumberOfReplicas, info.RefreshInterval, nil
+}
+
+func (m *MemoryStore) DeleteTask(taskID string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	delete(m.Store, taskID)
+	return nil
 }
 
 func (m *MemoryStore) AllTask() map[string]entity.Task {

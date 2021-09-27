@@ -10,6 +10,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/ory/dockertest v3.3.5+incompatible
 	github.com/po3rin/eskeeper v0.1.4
+	github.com/slack-go/slack v0.9.5 // indirect
 	go.uber.org/zap v1.19.1
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	gotest.tools v2.2.0+incompatible // indirect
