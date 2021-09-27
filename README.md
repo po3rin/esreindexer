@@ -56,6 +56,16 @@ yellow open example-v1 LnXp-WjXQh2iDjyCBd9fxg 2 2 2 0 4.2kb 4.2kb
 yellow open example-v2 4pxR7cpvSU-p0mg1vol6-A 2 2 2 0 4.1kb 4.1kb
 ```
 
+### Environment Values
+
+| name                      | description             |
+| ------------------------- | ----------------------- |
+| ESREINDEXER_LOGGING_LEVEL | reindexer logging level |
+| ESREINDEXER_API_PORT      | reindexer API port      |
+| ESREINDEXER_ES_ADDRESS    | Elasticsearch address   |
+| ESREINDEXER_ES_USER       | Elasticsearch user name |
+| ESREINDEXER_ES_PASS       | Elasticsearch password  |
+
 ## Using esreindexer components
 
 Implementation example using esreindexer components is in the [example directory](https://github.com/po3rin/esreindexer/tree/main/example).
