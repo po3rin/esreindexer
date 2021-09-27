@@ -90,6 +90,7 @@ func (m *ReindexManager) Monitor(ctx context.Context) error {
 							if err != nil {
 								logger.L.Errorf("delete completed task %v: %v", id, err)
 							}
+							logger.L.Infof("completed task %v is expired. So, task info is deleted in store", id)
 						}
 						continue
 					}
