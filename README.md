@@ -58,13 +58,14 @@ yellow open example-v2 4pxR7cpvSU-p0mg1vol6-A 2 2 2 0 4.1kb 4.1kb
 
 ### Environment Values
 
-| name                      | description             |
-| ------------------------- | ----------------------- |
-| ESREINDEXER_LOGGING_LEVEL | reindexer logging level |
-| ESREINDEXER_API_PORT      | reindexer API port      |
-| ESREINDEXER_ES_ADDRESS    | Elasticsearch address   |
-| ESREINDEXER_ES_USER       | Elasticsearch user name |
-| ESREINDEXER_ES_PASS       | Elasticsearch password  |
+| name                       | description                                                             |
+| -------------------------- | ----------------------------------------------------------------------- |
+| ESREINDEXER_LOGGING_LEVEL  | reindexer logging level                                                 |
+| ESREINDEXER_API_PORT       | reindexer API port                                                      |
+| ESREINDEXER_ES_ADDRESS     | Elasticsearch address                                                   |
+| ESREINDEXER_ES_USER        | Elasticsearch user name                                                 |
+| ESREINDEXER_ES_PASS        | Elasticsearch password                                                  |
+| ESREINDEXER_EXPIRE_DURAION | This specifies how long a task with a status of "done" will be retained |
 
 ## Using esreindexer components
 
