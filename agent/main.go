@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/po3rin/esreindexer"
@@ -35,7 +36,7 @@ func main() {
 	}
 
 	m := esreindexer.NewReindexManager(
-		esreindexer.NewESClient(es), store.NewMemoryStore(),
+		esreindexer.NewESClient(es), store.NewMemoryStore(10*time.Second),
 	)
 
 	srv := server.New(fmt.Sprintf(":%d", config.Conf.ApiPort), m)

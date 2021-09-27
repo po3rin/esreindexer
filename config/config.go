@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"time"
 
 	"github.com/kelseyhightower/envconfig"
 )
@@ -9,11 +10,12 @@ import (
 var Conf Config
 
 type Config struct {
-	LoggingLevel string `default:"DEBUG"`
-	ApiPort      int    `default:"8888"`
-	EsAddress    string `default:"http://localhost:9200"`
-	EsUser       string
-	EsPass       string
+	LoggingLevel   string `default:"DEBUG"`
+	ApiPort        int    `default:"8888"`
+	EsAddress      string `default:"http://localhost:9200"`
+	EsUser         string
+	EsPass         string
+	ExpireDuration time.Duration `default:"48h"`
 }
 
 func init() {

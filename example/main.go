@@ -28,7 +28,7 @@ func main() {
 	}
 
 	m := esreindexer.NewReindexManager(
-		esreindexer.NewESClient(es), store.NewMemoryStore(),
+		esreindexer.NewESClient(es), store.NewMemoryStore(30*time.Second),
 	)
 
 	eg, ctx := errgroup.WithContext(ctx)

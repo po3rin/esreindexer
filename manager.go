@@ -14,6 +14,7 @@ type Store interface {
 	PutTaskInfo(index string, taskID string, NumberOfReplicas int, RefreshInterval int) error
 	TaskInfo(taskID string) (numberOfReplicas int, refreshInterval int, err error)
 	DeleteTask(taskID string) error
+	DoneTask(taskID string) error
 	AllTask() map[string]entity.Task
 }
 
@@ -77,7 +78,23 @@ func (m *ReindexManager) Monitor(ctx context.Context) error {
 					continue
 				}
 
+				now := time.Now()
+
 				for id, task := range ids {
+
+					// ignore done status task.
+					// delete task if task is expired.
+					if task.Status == entity.Done {
+						if now.After(task.ExpireDate) {
+							err := m.store.DeleteTask(id)
+							if err != nil {
+								logger.L.Errorf("delete completed task %v: %v", id, err)
+							}
+						}
+						continue
+					}
+
+					// check if the task is finished
 					completed, err := m.client.CompletedTask(ctx, id)
 					if err != nil {
 						if errors.Is(err, context.DeadlineExceeded) {
@@ -86,6 +103,8 @@ func (m *ReindexManager) Monitor(ctx context.Context) error {
 						logger.L.Warn(err)
 						continue
 					}
+
+					// if task is completed, update task status and run completion plugin func.
 					if completed {
 						logger.L.Infof("task %v is completed!", id)
 						err := m.client.UpdateIndexSetting(
@@ -101,11 +120,9 @@ func (m *ReindexManager) Monitor(ctx context.Context) error {
 							logger.L.Warnf("update index setting: %v", err)
 							continue
 						}
-
-						err = m.store.DeleteTask(id)
+						err = m.store.DoneTask(id)
 						if err != nil {
-							logger.L.Errorf("delete completed task %v: %v", id, err)
-							continue
+							logger.L.Errorf("update task status to done %v: %v", id, err)
 						}
 
 						if m.afterCompletionPlugin == nil {
