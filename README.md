@@ -27,8 +27,7 @@ The information of the task to be monitored is saved in the esreindexer store. T
 
 ### Others
 - [ ] WebHook
-- [ ] Before Plugin
-- [ ] After Plugin
+- [ ] Completed Plugin
 
 ## Using esreindexer as API server
 
